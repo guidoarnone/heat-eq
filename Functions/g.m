@@ -1,3 +1,3 @@
 function z = g(x,y)
-  z = 0
+  z = 0;
 endfunction
