@@ -21,7 +21,7 @@ function A = hoteq(alpha, h, dt, f_index)
 
   for i = 1:N
   	for j = 1:N
-     u(coord(i,j)) = g(x(i),y(j));
+     u(coord(i,j, N)) = g(x(i),y(j));
     end 
   end
 
@@ -32,14 +32,14 @@ function A = hoteq(alpha, h, dt, f_index)
    for i = 1:N
      for j = 1:N
        for l = 1:(N^2)
-           A(coord(i,j), l) = 0; 
+           A(coord(i,j,N), l) = 0; 
        end
        if i > 1 && i < N && j > 1 && j < N
-         A(coord(i,j),coord(i,j)) = eta;
-         A(coord(i,j),coord(i,j+1)) = mu;
-         A(coord(i,j),coord(i,j-1)) = mu;
-         A(coord(i,j),coord(i+1,j)) = mu;
-         A(coord(i,j),coord(i-1,j)) = mu;
+         A(coord(i,j,N),coord(i,j,N)) = eta;
+         A(coord(i,j,N),coord(i,j+1,N)) = mu;
+         A(coord(i,j,N),coord(i,j-1,N)) = mu;
+         A(coord(i,j,N),coord(i+1,j,N)) = mu;
+         A(coord(i,j,N),coord(i-1,j,N)) = mu;
        end
      end
    end
