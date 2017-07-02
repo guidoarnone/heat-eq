@@ -18,13 +18,11 @@ function u = hoteq(alpha, h, dt, f_index)
   for i = 1:M+1     #t empieza desde 0
     t(i) = dt*(i-1);
   end
-  #NOs estaba faltando en la la funcion coord el tercer argumento que varia 
-  for k = 1:N+1
-    for i = 1:N+1
-  	  for j = 1:N+1
+  
+  for i = 1:N+1
+	  for j = 1:N+1
     
-         lu(coord(i,j,k)) = g(x(i),y(j));
-      end 
+         lu(coord(i,j,N)) = g(x(i),y(j)); 
     end
   end
   
@@ -35,32 +33,28 @@ function u = hoteq(alpha, h, dt, f_index)
  
  for k = 1:M+1
    u = (-1*M)*lu;
-   for l = 2:N+1 
-     for i = 1:N+1
-  	   for j = 1:N+1
-        lu(coord(i,j,l)) -= f(x(i),y(j),t(k), f_index);
-         
-       end
+   for i = 1:N+1
+  	 for j = 1:N+1
+       lu(coord(i,j,N)) -= f(x(i),y(j),t(k), f_index);
      end 
    end
  end
  
  
-   for l = 1:N+1
-     for i = 1:N+1
-       for j = 1:N+1
-         for k = 1:((N+1)^2)
-             A(coord(i,j,l), k) = 0;
+   for i = 1:N+1
+     for j = 1:N+1
+       for k = 1:((N+1)^2)
+           A(coord(i,j,N), k) = 0;
        
-         end
+       end
          
-         if i > 1 && i < N+1 && j > 1 && j < N+1
+       if i > 1 && i < N+1 && j > 1 && j < N+1
                   
-           A(coord(i,j,l),coord(i,j,l)) = eta;
-           A(coord(i,j,l),coord(i,j+1,l)) = mu;
-           A(coord(i,j,l),coord(i,j-1,l)) = mu;
-           A(coord(i,j,l),coord(i+1,j,l)) = mu;
-           A(coord(i,j,l),coord(i-1,j,l)) = mu;
+           A(coord(i,j,N),coord(i,j,N)) = eta;
+           A(coord(i,j,N),coord(i,j+1,N)) = mu;
+           A(coord(i,j,N),coord(i,j-1,N)) = mu;
+           A(coord(i,j,N),coord(i+1,j,N)) = mu;
+           A(coord(i,j,N),coord(i-1,j,N)) = mu;
          
            
        end
