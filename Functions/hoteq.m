@@ -4,7 +4,7 @@ function U = hoteq(alpha, h, dt, f_index)
   N = 1/h ;
   M = 1/dt;
   mu = alpha*N^2;
-  eta = M + 4*mu;
+  eta =  -M - 4*mu;
 
   #Inicializamos la matriz del sistema y la grilla
   A = zeros(N^2,N^2);
