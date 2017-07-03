@@ -3,8 +3,7 @@ function U = hoteq(alpha, h, dt, f_index)
   # Datos iniciales
   N = 1/h ;
   M = 1/dt;
-  mu = alpha*N^2;
-  eta =  -M - 4*mu;
+  mu = alpha*(N^2)*dt;
 
   #Inicializamos la matriz del sistema y la grilla
   A = zeros(N^2,N^2);
@@ -31,10 +30,10 @@ function U = hoteq(alpha, h, dt, f_index)
  #matriz anterior, basandonos en cierta relacion de
  #recurrencia.
  for k = 1:M
-   lu = (-1*M)*u;
+   lu = (-1)*u;
    for i = 1:N
      for j = 1:N
-       lu(coord(i,j, N)) -= f(x(i),y(j),t(k), f_index);
+       lu(coord(i,j, N)) -= dt*f(x(i),y(j),t(k), f_index);
      end 
    end
    for i = 1:N
@@ -43,7 +42,7 @@ function U = hoteq(alpha, h, dt, f_index)
            A(coord(i,j,N), l) = 0; 
        end
        if i > 1 && i < N && j > 1 && j < N
-         A(coord(i,j,N),coord(i,j,N)) = eta;
+         A(coord(i,j,N),coord(i,j,N)) = (-1) -(4*mu);
          A(coord(i,j,N),coord(i,j+1,N)) = mu;
          A(coord(i,j,N),coord(i,j-1,N)) = mu;
          A(coord(i,j,N),coord(i+1,j,N)) = mu;
@@ -52,7 +51,7 @@ function U = hoteq(alpha, h, dt, f_index)
      end
    end
    u = (A\lu')';
-   U = to_matrix(u,N)
+   U = to_matrix(u,N);
  end      
   
 endfunction
