@@ -26,7 +26,7 @@ function U = hoteq(alpha, h, dt, f_index)
   #
   #octave:1> hoteq(1,0.1,0.001,1)
   #
-  #En este caso discretizamos el cuadrado en 100 puntos y el tiempo en 100 instantes. Utilizamos la funcion 1. Por defecto, g esta definida 
+  #En este caso discretizamos el cuadrado en 100 puntos y el tiempo en 1000 instantes. Utilizamos la funcion 1. Por defecto, g esta definida 
   #como g(x,y) = 0, pero se puede utilizar por ejemplo g(x,y) = 10000*sin(pi*x)*y*(1-y) y descomentar mas abajo la impresion de la matriz
   #inicial, para comparar la evolucion de la temperatura.
 
