@@ -1,13 +1,29 @@
 function U = hoteq(alpha, h, dt, f_index)
   
   # Datos iniciales
-  N = 1/h ;
-  M = 1/dt;
-  mu = alpha*(N^2)*dt;
+  N = 1/h + 1;
+  M = 1/dt + 1;
+  K = N-2; 
+  mu = (alpha*dt)/(h^2);
 
-  #Inicializamos la matriz del sistema y la grilla
-  A = zeros(N^2,N^2);
+  #  En base a la discretizacion del espacio, generamos un sistema de ecuaciones,
+  #donde la temperatura en los puntos de la discretizacion en el tiempo actual son
+  #las incognitas, la temperatura en el paso anterior es el dato conocido, y la matriz
+  #depende de una relacion mu entre dt, h y alpha.
+  #  La matriz resulta en un principio no inversible, pues los puntos de la 
+  #discretizacion que se ecuentran en los bordes dan la ecuacion u^n_ij = 0, agregando
+  #filas de ceros. Esto se resuelve ignorando los puntos del borde de la region, que no aportan informacion
+  #pues su temperatura es siempre nula, y resolviendo el mismo problema para una submatriz
+  #que tiene el mismo formato, y es inversible. Como tenemos que pensar la discretizacion del
+  #cuadrado como un vector columna de incognitas, armamos las funciones auxiliares coord y to_matrix. La primera es
+  #simplemente una biyeccion de {1,..k}x{1,..k} a {1,..,k^2}, ya segunda toma un vector de k^2 coordenadas y lo
+  #pasa a una matriz de k x k.
+  #  Finalmente, resolvemos el sistema iterativamente tantas veces como sea pedido, y luego pasamos de la submatriz conseguida
+  #a la que se nos pide simplemente agregando ceros en los bordes. 
+
   U = zeros(N,N);
+  H = zeros(K,K); 
+  A = zeros(K^2,K^2); 
 
 
   #Generamos las coordenadas de la cuadricula y el tiempo
@@ -20,41 +36,57 @@ function U = hoteq(alpha, h, dt, f_index)
     t(i) = dt*(i-1);
   end
 
-  for i = 1:N
-    for j = 1:N
-     u(coord(i,j, N)) = g(x(i),y(j));
+  #Inicializamos el vector de incognitas, que para el paso inicial es conocido.
+  for i = 1:K
+    for j = 1:K
+     #Corremos en uno las posiciones en el lado derecho de la igualdad, pues las coordenadas
+     #(i,j) de H, la cual ahora pensamos en forma de columna via u, son las coordenadas
+     #(i+1,j+1) de la matriz original U
+     u(coord(i,j,K)) = g(x(i+1),y(j+1));
     end 
   end
 
  #Llenamos la matriz del sistema en base a los coeficientes
- #anteriormente calculados.
- for i = 1:N
-    for j = 1:N
-      for l = 1:(N^2)
-          A(coord(i,j,N), l) = 0; 
+ #anteriormente calculados
+ for i = 1:K
+    for j = 1:K
+      A(coord(i,j,K),coord(i,j,K)) = (-1) -(4*mu);
+      if i > 1
+        A(coord(i,j,K),coord(i-1,j,K)) = mu;
       end
-      if i > 1 && i < N && j > 1 && j < N
-        A(coord(i,j,N),coord(i,j,N)) = (-1) -(4*mu);
-        A(coord(i,j,N),coord(i,j+1,N)) = mu;
-        A(coord(i,j,N),coord(i,j-1,N)) = mu;
-        A(coord(i,j,N),coord(i+1,j,N)) = mu;
-        A(coord(i,j,N),coord(i-1,j,N)) = mu;
+      if i < K
+        A(coord(i,j,K),coord(i+1,j,K)) = mu;
+      end
+      if j > 1 
+        A(coord(i,j,K),coord(i,j-1,K)) = mu;
+      end
+      if j < K
+        A(coord(i,j,K),coord(i,j+1,K)) = mu;
       end
     end
  end
-
+ 
  #Resolvemos para cada t un sistema lineal, en base a la
  #solucion anterior del sistema basandonos en cierta relacion de
  #recurrencia.
- for k = 1:M
+ for s = 1:M
    lu = (-1)*u;
-   for i = 1:N
-     for j = 1:N
-       lu(coord(i,j, N)) -= dt*f(x(i),y(j),t(k), f_index);
+   for i = 1:K
+     for j = 1:K
+       #Corremos en uno las posiciones en el lado derecho de la igualdad, pues las coordenadas
+       #(i,j) de H, la cual ahora pensamos en forma de columna via u, son las coordenadas
+       #(i+1,j+1) de la matriz original U
+       lu(coord(i,j,K)) -= dt*f(x(i+1),y(j+1),t(s), f_index);
      end 
    end
    u = (A\lu')';
-   U = to_matrix(u,N);
  end      
-  
+
+ H = to_matrix(u,K);
+ for i = 2:(N-1)
+   for j = 2:(N-1)
+     U(i,j) = H(i-1,j-1);
+   end
+ end 
+
 endfunction
