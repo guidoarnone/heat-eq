@@ -104,7 +104,8 @@ function U = hoteq(alpha, h, dt, f_index)
    #  for j = 2:(N-1)
    #    U(i,j) = H(i-1,j-1);
    #  end
-   #end 
+   #end
+   #H 
  end      
 
  H = to_matrix(u,K);
